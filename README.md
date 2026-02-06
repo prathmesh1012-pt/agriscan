@@ -1,22 +1,21 @@
-# 🌿 AgriScan - Smart Crop Disease Detection System
+# 🌿 AgriScan - The Living Farm
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue?style=for-the-badge&logo=python)
 ![Flask](https://img.shields.io/badge/Flask-Framework-lightgrey?style=for-the-badge&logo=flask)
 ![MySQL](https://img.shields.io/badge/MySQL-Cloud_Database-blue?style=for-the-badge&logo=mysql)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative)
 
-**AgriScan** हे एक AI-आधारित वेब पोर्टल आहे जे शेतकऱ्यांना पिकांवरील रोगांचे त्वरित निदान करण्यास मदत करते. पिकाच्या पानाचा फोटो अपलोड करा आणि अचूक माहितीसह उपाय मिळवा.
-
-## ✨ मुख्य वैशिष्ट्ये (Features)
-- ✅ **Instant Detection:** इमेज प्रोसेसिंगद्वारे पिकावरील रोगाचे अचूक निदान.
-- ✅ **Cloud Storage:** Aiven MySQL द्वारे डेटा कधीही आणि कुठेही उपलब्ध.
-- ✅ **User History:** प्रत्येक स्कॅनचा रेकॉर्ड सुरक्षितपणे साठवला जातो.
-- ✅ **Secure Login:** कस्टमाइझ्ड युजर ऑथेंटिकेशन सिस्टिम.
+**AgriScan** is an AI-powered web portal designed to assist farmers in the instant diagnosis of crop diseases. Simply upload a photo of a crop leaf to receive accurate information along with effective treatment recommendations.
+## ✨ Key Features
+-✅ Instant Detection: Accurate diagnosis of crop diseases using advanced image processing and Deep Learning.
+-✅ Cloud Storage: Data is securely hosted on Aiven MySQL, ensuring accessibility anytime and anywhere.
+-✅ User History: Every scan record is safely stored, allowing users to track and monitor crop health over time.
+-✅ Secure Login: Integrated with a customized user authentication system to ensure data privacy and security.
 
 ## 🛠️ Tech Stack
 - **Backend:** Python (Flask)
 - **Frontend:** HTML5, CSS3, JavaScript, Bootstrap
 - **Database:** MySQL (Hosted on Aiven Cloud)
 - **Model:** Convolutional Neural Network (CNN) - Deep Learning
-## 🛠️ To Contributer :
+## ❤️ To Contributer 
 Contributions make the open-source community an amazing place to learn and create. Any contributions you make are greatly appreciated. Feel free to fork the repo and create a pull request!
