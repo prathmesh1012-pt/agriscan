@@ -157,4 +157,37 @@ form input, form textarea {
             </div>
         </div>
     </section>
+   
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+       
+        const messages = {{ get_flashed_messages(with_categories=true) | tojson | safe }};
+        
+        messages.forEach(function(item) {
+            const category = item[0];
+            const message = item[1];
+            
+        
+            if (category === 'contact-success') {
+                Swal.fire({
+                    title: 'Success!',
+                    text: message,
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    timer: 4000
+                });
+            } else if (category === 'contact-error') {
+                Swal.fire({
+                    title: 'Oops...',
+                    text: message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        });
+    });
+</script>
+
     {% endblock %}

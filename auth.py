@@ -90,9 +90,9 @@ def contact_submit():
             cursor.close()
             conn.close()
             
-            flash("Tumcha sandesh amchyaparyant pohochala aahe! Dhanyavad.", "success")
+            flash("Your message has been sent successfully!", "contact-success")
         except Exception as e:
             print(f"Error: {e}")
-            flash("Kahi tari chukle aahe, parat prayatna kara.", "danger")
+            flash("An error occurred while sending your message.", "contact-error")
 
         return redirect(url_for('contacts')) 
