@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    :root {
+        --sidebar-width: 260px;
+        --sidebar-collapsed-width: 0px; /* पूर्णपणे हाईड करण्यासाठी */
+    }
+
+    body { background-color: #0f1b14; color: white; transition: 0.3s; overflow-x: hidden; }
+
+    /* Sidebar Styling */
+    .sidebar { 
+        width: var(--sidebar-width); 
+        height: 100vh; 
+        background: #162a1d; 
+        position: fixed; 
+        left: 0; 
+        top: 0; 
+        padding: 20px; 
+        transition: 0.3s;
+        border-right: 1px solid #2d5a27;
+        overflow: hidden;
+        margin-top: 60px;
+    }
+
+    /* मुख्य कंटेंटची जागा */
+    /* जेव्हा sidebar 'collapsed' असेल तेव्हा main-content डावीकडे सरकेल */
+.main-content {
+    margin-left: 260px; /* Sidebar ची रुंदी */
+    width: calc(100% - 260px);
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed + .main-content {
+    margin-left: 0;
+    width: 100%;
+}
+
+    /* Sidebar लपवल्यावर होणारा बदल */
+    .sidebar.collapsed { left: -260px; }
+    .main-content.expanded { margin-left: 0; }
+
+    /* Hamburger Menu Button */
+    .toggle-btn {
+    position: fixed;
+    left: 10px;
+    top: 60px;
+    background: #4CAF50;
+    color: #0f1b14;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1;
+    font-size: 20px;
+    }
+
+    .stat-card { background: linear-gradient(135deg, #1e3a29 0%, #0f1b14 100%); padding: 20px; border-radius: 15px; border: 1px solid #4CAF50; margin-bottom: 20px; }
+    .nav-links a { display: block; color: #bbb; padding: 15px; text-decoration: none; border-radius: 10px; cursor: pointer; }
+    .nav-links a:hover { background: #4CAF50; color: #0f1b14; }
+    .nav-links a.active {
+    background: rgba(76, 175, 80, 0.15); /* फिकट हिरवा बॅकग्राउंड */
+    color: #4CAF50 !important;         /* हिरवा अक्षर */
+    border-left: 5px solid #4CAF50;    /* डावीकडे जाड पट्टी */
+    font-weight: 600;
+}
+    .content-section { display: none; }
+    .active-section { 
+    display: block !important; /* फक्त ॲक्टिव्ह असेल तोच दाखवा */
+    margin-top: 90px; 
+    margin-left: 5px;
+    margin-bottom: 6rem;
+    }
+    .stat-card:hover {
+    transform: translateY(-5px);
+    transition: 0.3s ease;
+    box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
+}
+
+#farming-tip {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<button class="toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="sidebar" id="sidebar">
+    <h2 style="color: #4CAF50; margin-top: 50px;">DASHBOARD</h2>
+    <div class="nav-links">
+        <a onclick="showSection('overview', this)"><i class="fas fa-home"></i> Overview</a>
+        <a onclick="showSection('smart-tips', this)"><i class="fas fa-seedling"></i> Smart farming Tips</a>
+        <a onclick="showSection('profile', this)"><i class="fas fa-user-circle"></i> Profile</a>
+        <a href="/logout" class="text-danger mt-5"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+</div>
+
+<div class="main-content" id="main-content">
+    <div id="overview" class="content-section active-section">
+        <h1 class="user-welcome mt-4">welcome, {{ name }}! 👋</h1>
+        
+        <div class="stat-grid mt-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="stat-card">
+                       <h5 class="text-success"><i class="fas fa-flask"></i> Recent Fertilizer Recommendations</h5>
+                            <table class="table table-dark table-hover mt-3">
+                                <thead><tr><th>Crop</th><th>Result</th><th>Date</th></tr></thead>
+                                <tbody>
+                                    {% for f in fert_reports %}
+                                    <tr><td>{{ f.crop_name }}</td><td>{{ f.prediction }}</td><td>{{ f.created_at.strftime('%d %b') }}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    <div class="stat-card">
+                        <h5 class="text-primary"><i class="fas fa-seedling"></i> Recent Crop Recommendations</h5>
+                        <table class="table table-dark table-hover mt-3">
+                            <thead><tr><th>Top Choice</th><th>Confidence</th><th>Date</th></tr></thead>
+                            <tbody>
+                                {% for c in crop_reports %}
+                                <tr><td>{{ c.crop_1_name }}</td><td>{{ c.crop_1_conf }}%</td><td>{{ c.created_at.strftime('%d %b') }}</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ <div id="smart-tips" class="content-section active-section">
+        <h1 class="user-welcome mt-4">welcome, {{ name }}! 👋</h1>
+        
+        <div class="stat-card border-success bg-dark text-white p-4 mb-4" style="border-left: 5px solid #28a745;">
+    <div class="d-flex align-items-center mb-2">
+        <i class="fas fa-lightbulb text-warning fa-2x me-3"></i>
+        <h5 class="mb-0 text-success">Smart Farming Tip of the Day</h5>
+    </div>
+    <p id="farming-tip" class="lead mt-3" style="font-style: italic;">
+        Loading tips for a better harvest...
+    </p>
+</div>
+    </div>
+
+    <div id="profile" class="content-section">
+    <h2 class="text-success mb-4"><i class="fas fa-user-edit"></i> Profile Settings</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-circle fa-5x text-success"></i>
+                </div>
+                <h4>{{ name }}</h4>
+                <p class="text-muted">Farmer ID: #{{ session['user_id'] }}</p>
+                <button class="btn btn-sm btn-outline-success w-100" onclick="toggleEdit()">
+                    <i class="fas fa-pen"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="stat-card">
+                <form action="/update-profile" method="POST" id="profile-form">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Full Name</label>
+                        <input type="text" name="name" class="form-control bg-dark text-white border-success" value="{{ name }}" id="p-name" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Email (Cannot be changed)</label>
+                        <input type="email" name="email" class="form-control bg-dark text-white border-secondary" value="{{ email }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Mobile Number</label>
+                        <input type="text" name="mobile" class="form-control bg-dark text-white border-success" value="{{ mobile if mobile else '' }}" id="p-mobile" disabled placeholder="Add Mobile Number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Address</label>
+                        <input type="text" name="address" class="form-control bg-dark text-white border-success" value="{{ address if address else '' }}" id="p-address" disabled placeholder="Add Address">
+                    </div>
+                    <div id="save-btn-container" style="display: none;">
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                        <button type="button" class="btn btn-outline-light" onclick="toggleEdit()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+        document.getElementById('main-content').classList.toggle('expanded');
+    }
+
+   function showSection(sectionId, element) {
+    // १. सर्व सेक्शन्स लपवा
+    document.querySelectorAll('.content-section').forEach(s => {
+        s.style.display = 'none';
+        s.classList.remove('active-section'); // जुना क्लास काढा
+    });
+
+    // २. फक्त क्लिक केलेला सेक्शन दाखवा
+    const activeSection = document.getElementById(sectionId);
+    
+    if (activeSection) {
+        activeSection.style.display = 'block';
+        activeSection.classList.add('active-section'); // नवीन क्लास ॲड करा
+    }
+
+    // ३. सर्व साईडबार लिंक्सची स्टाईल रिसेट करा
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.style.background = "transparent";
+        link.style.color = "#bbb";
+        link.style.borderLeft = "none";
+        link.style.fontWeight = "400";
+    });
+
+    // ४. क्लिक केलेल्या बटनला हायलाईट करा
+    element.style.background = "rgba(76, 175, 80, 0.15)";
+    element.style.color = "#4CAF50";
+    element.style.borderLeft = "5px solid #4CAF50";
+    element.style.fontWeight = "600";
+}
+function toggleEdit() {
+    let nameInput = document.getElementById('p-name');
+    let mobileInput = document.getElementById('p-mobile');
+    let addressInput = document.getElementById('p-address');
+    let saveBtn = document.getElementById('save-btn-container');
+
+    // जर आधीच disabled असेल तर उघडा, नसेल तर बंद करा
+    if (nameInput.disabled) {
+        nameInput.disabled = false;
+        mobileInput.disabled = false;
+        addressInput.disabled = false;
+        saveBtn.style.display = 'block';
+    } else {
+        nameInput.disabled = true;
+        mobileInput.disabled = true;
+        addressInput.disabled = true;
+        saveBtn.style.display = 'none';
+    }
+}
+window.onload = function() {
+    // १. URL मधून पॅरामीटर्स तपासा
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // २. जर अपडेट सक्सेसफुल असेल तर अलर्ट दाखवा
+    if (urlParams.has('updated')) {
+        alert("✅ Profile updated successfully!");
+    }
+
+    // ३. जर URL मध्ये #profile असेल तर तो विभाग दाखवा
+    if (window.location.hash === '#profile') {
+        showSection('profile'); 
+    }
+}
+const farmingTips = [
+    "Test your soil every 2 years to understand its exact Nutrient (NPK) needs.",
+    "Rotating crops, like planting beans after rice, helps restore natural Nitrogen levels in soil.",
+    "Applying fertilizer after heavy rain is less effective as nutrients can wash away.",
+    "Proper pH balance (usually 6.0 to 7.0) is crucial for plants to absorb fertilizers effectively.",
+    "Adding organic matter like compost improves soil structure and water retention.",
+    "Using the right fertilizer at the right growth stage can increase yield by up to 30%.",
+    "Monitor humidity levels; high humidity often leads to fungal diseases in crops."
+];
+
+function displayRandomTip() {
+    const tipElement = document.getElementById('farming-tip');
+    const randomIndex = Math.floor(Math.random() * farmingTips.length);
+    tipElement.innerText = farmingTips[randomIndex];
+}
+
+// पेज लोड झाल्यावर टीप दाखवा
+window.addEventListener('DOMContentLoaded', displayRandomTip);
+</script>
+{% endblock %}

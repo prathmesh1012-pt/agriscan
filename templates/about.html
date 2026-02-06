@@ -1,0 +1,155 @@
+{% extends "base.html"%}
+
+{% block title %}about{% endblock %}
+    {% block head %}
+  
+    <style>
+        :root {
+            --primary-green: #1a2e21;
+            --accent-green: #8bc34a;
+            --dark-bg: #0f1a13;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-muted: #b0b0b0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(rgba(15, 26, 19, 0.8), rgba(15, 26, 19, 0.8)), 
+                        url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            border-bottom: 2px solid var(--primary-green);
+        }
+
+        .hero h1 { font-size: 3.5rem; margin: 0; }
+        .hero h1 span { color: var(--accent-green); }
+        .hero p { color: var(--accent-green); font-size: 1.2rem; letter-spacing: 1px; }
+
+        /* Sections */
+        .section-title {
+            color: var(--accent-green);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .content-block {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .vision-box { text-align: center; max-width: 800px;
+             margin: 20px auto 60px; }
+
+        /* Features Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.03);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-green);
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255,255,255,0.07);
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 { color: var(--accent-green); margin-top: 0; }
+        .feature-card p { font-size: 0.95rem; color: var(--text-muted); }
+
+        /* Why Choose Us List */
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .benefit-item {
+            background: var(--primary-green);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+      {% endblock %}
+   
+{% block content %}
+
+    <div class="container">
+        
+        <div class="vision-box">
+            <h2 class="section-title">Our Vision</h2>
+            <p>At AgriScan, our mission is to bridge the gap between traditional farming wisdom and modern data science. We believe that every farmer deserves access to precision tools that take the guesswork out of agriculture, ensuring food security and sustainable growth for the future.</p>
+        </div>
+
+        <div class="content-block">
+            <h2 class="section-title">What is AgriScan?</h2>
+            <p style="text-align: center;">AgriScan is an advanced AI-driven platform designed to provide actionable insights to farmers and agricultural researchers. By leveraging Machine Learning (ML) models and real-time data analytics, we offer a suite of services aimed at optimizing every stage of the crop lifecycle.</p>
+        </div>
+
+        <h2 class="section-title">What We Do</h2>
+        <div class="grid">
+            <div class="feature-card">
+                <h3>Precision Recommendations</h3>
+                <p>Eliminate guesswork with data-backed recommendations. Optimize your resources and increase yield with precise, real-time farming insights.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Nutrient Optimization</h3>
+                <p>We identify nutrient deficiencies in the soil and recommend precise fertilizer blends to improve soil vitality and crop health.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Climate Intelligence</h3>
+                <p>Our platform compares historical weather trends with current forecasts, allowing farmers to prepare for climate shifts and manage resources like water more effectively.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Data-Driven Analytics</h3>
+                <p>We transform complex agricultural data into simple, visual charts, making it easy to understand soil health and harvest potential at a glance.</p>
+            </div>
+        </div>
+
+        <br><br>
+
+        <div class="content-block">
+            <h2 class="section-title">Why Choose Us?</h2>
+            <div class="benefits-list">
+                <div class="benefit-item">✓ Accuracy (ML Trained Datasets)</div>
+                <div class="benefit-item">✓ Sustainability (Eco-Friendly)</div>
+                <div class="benefit-item">✓ Innovation (Satellite & AI)</div>
+            </div>
+            <p style="text-align: center; margin-top: 30px; color: var(--text-muted);">
+                Our models ensure high-quality predictions, prevent over-application of chemicals, and integrate new technologies like satellite insights to keep our users ahead of the curve.
+            </p>
+        </div>
+
+    </div>
+{% endblock %}

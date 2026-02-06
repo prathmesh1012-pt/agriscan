@@ -1,0 +1,159 @@
+{% extends "base.html"%}
+
+{% block title %}History{% endblock %}
+
+    {% block head %}
+    <style>
+    .stat-mini-card {
+    background: #121f16;
+    border-left: 4px solid #a8e063;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.stat-mini-card h6 { color: #888; text-transform: uppercase; font-size: 12px; }
+.stat-mini-card h3 { color: #fff; margin: 0; }
+
+.custom-table {
+    background: #0f1b14 !important;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.custom-table thead {
+    background: #1a2e20;
+    color: #a8e063;
+}
+
+.prediction-text {
+    background: rgba(168, 224, 99, 0.1);
+    color: #a8e063;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #a8e063;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white"><i class="fas fa-history text-success"></i> Detailed Analysis History</h2>
+        <div class="search-box">
+            <input type="text" id="myInput" onkeyup="searchTable()" placeholder="Search by crop..." class="form-control bg-dark text-white border-success">
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-mini-card">
+                <h6>Total Analysis</h6>
+                <h3>{{ total_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover custom-table" id="historyTable">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Recommendations / Result</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in history_records %}
+        <tr>
+            <td>{{ record.created_at.strftime('%d %b, %y') }}</td>
+            <td>
+                <span class="badge {% if record.entry_type == 'Fertilizer' %}bg-success{% else %}bg-primary{% endif %}">
+                    {{ record.entry_type }}
+                </span>
+            </td>
+            <td>
+                {% if record.entry_type == 'Fertilizer' %}
+                    <div class="font-weight-bold text-white">{{ record.crop_name }}</div>
+                    <span class="prediction-text text-success">{{ record.res_1 }}</span>
+                {% else %}
+                    <div class="d-flex flex-column gap-1">
+                        <span class="text-white">1. {{ record.res_1 }} ({{ record.conf_1 }}%)</span>
+                        <small class="text-muted">2. {{ record.res_2 }} ({{ record.conf_2 }}%)</small>
+                        <small class="text-muted">3. {{ record.res_3 }} ({{ record.conf_3 }}%)</small>
+                    </div>
+                {% endif %}
+            </td>
+            <td>
+                {% if record.entry_type == 'Fertilizer' %}
+                    <a href="{{ url_for('fertilizer.download_pdf', record_id=record.id) }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-download"></i> PDF
+                    </a>
+                {% else %}
+                    <button class="btn btn-sm btn-outline-primary" onclick="showCropDetails({{ record.id }})">
+                    <i class="fas fa-eye"></i> Details
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+    </div>
+</div>
+<div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-success">
+      <div class="modal-header border-success">
+        <h5 class="modal-title text-success"><i class="fas fa-seedling"></i> Analysis Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modal-body-content">
+          </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    function showCropDetails(recordId) {
+    // डेटा लोड होत असतानाचा मेसेज
+    document.getElementById('modal-body-content').innerHTML = "Loading...";
+    var myModal = new bootstrap.Modal(document.getElementById('cropModal'));
+    myModal.show();
+
+    // API कडून डेटा मागवा
+    fetch('/get-crop-details/' + recordId)
+        .then(response => response.json())
+        .then(data => {
+            let content = `
+                <div class="p-2">
+                    <p><strong>Date:</strong> ${new Date(data.created_at).toLocaleDateString()}</p>
+                    <hr class="bg-secondary">
+                    <h6 class="text-success">Top Recommendations:</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-dark text-white">1. ${data.crop_1_name} - <b>${data.crop_1_conf}%</b></li>
+                        <li class="list-group-item bg-dark text-white">2. ${data.crop_2_name} - <b>${data.crop_2_conf}%</b></li>
+                        <li class="list-group-item bg-dark text-white">3. ${data.crop_3_name} - <b>${data.crop_3_conf}%</b></li>
+                    </ul>
+                    <hr class="bg-secondary">
+                    <h6 class="text-info">Input Values (Soil Data):</h6>
+                    <div class="d-flex justify-content-between">
+                        <span>N: ${data.nitrogen}</span>
+                        <span>P: ${data.phosphorus}</span>
+                        <span>K: ${data.potassium}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span>Temp: ${data.temperature}°C</span>
+                        <span>Humidity: ${data.humidity}%</span>
+                        <span>pH: ${data.ph_level}</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-body-content').innerHTML = content;
+        });
+}
+</script>
+{% endblock %}

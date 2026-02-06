@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Account Settings{% endblock %}
+{% block head %}
+<style>
+
+body {
+    background-color: #040906; 
+}
+
+.card.bg-dark {
+    background: #0d1a12 !important; 
+    border: 1px solid #1a3324 !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+    border-radius: 25px !important;
+    margin-top: 40px;
+}
+
+
+.form-control.bg-dark {
+    background-color: #060d09 !important;
+    border: 1px solid #2d4d3a !important;
+    color: #e0e0e0 !important;
+    border-radius: 12px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control.bg-dark:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.2) !important;
+    background-color: #0a140f !important;
+}
+
+.btn-success {
+    background: linear-gradient(145deg, #28a745, #1e7e34);
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.btn-outline-warning {
+    border-radius: 10px;
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #000;
+}
+
+
+.alert {
+    background: rgba(13, 26, 18, 0.9);
+    border-radius: 15px !important;
+    border-left: 5px solid;
+}
+
+.alert-update_success { border-color: #28a745; color: #28a745; }
+.alert-update_danger { border-color: #dc3545; color: #dc3545; }
+.alert-warning { border-color: #ffc107; color: #ffc107; }
+
+
+.p-3.border-danger {
+    background: rgba(220, 53, 69, 0.03) !important;
+    border-radius: 15px !important;
+}
+
+.text-muted {
+    color: #94a399 !important;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-dark text-white shadow-lg" style="border-radius: 20px; border: 1px solid #28a745;">
+                <div class="card-header border-success bg-transparent p-4">
+                    <h3 class="mb-0"><i class="fas fa-cog text-success me-2"></i> Account Settings</h3>
+                    <p class="text-muted small mb-0">Manage your security and preferences</p>
+                </div>
+                <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+            <strong>
+                {% if category == 'update_success' %} ✅ Success: 
+                {% elif category == 'update_danger' %} ❌ Error: 
+                {% else %} ⚠️ Warning: {% endif %}
+            </strong> 
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
+                <div class="card-body p-4">
+                    <section class="mb-5">
+                        
+    <h5 class="text-success mb-3"><i class="fas fa-shield-alt"></i> Secure Password Change</h5>
+    <form action="/verify-and-change-password" method="POST">
+        <div class="mb-3">
+            <label class="form-label text-muted">New Password</label>
+            <input type="password" name="new_password" class="form-control bg-dark text-white border-secondary" required>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label text-muted">Verification Code (OTP)</label>
+            <div class="input-group">
+                <input type="text" name="otp" class="form-control bg-dark text-white border-secondary" placeholder="Enter 6-digit OTP" required>
+                <button class="btn btn-outline-warning" type="button" onclick="sendOTP(this)">Send OTP</button>
+            </div>
+            <small class="text-info" id="otp-msg"></small>
+        </div>
+        
+        <button type="submit" class="btn btn-success px-4">Verify & Update Password</button>
+    </form>
+</section>
+
+                    <hr class="bg-secondary my-4">
+
+                    <section>
+                        <h5 class="text-danger mb-3"><i class="fas fa-exclamation-triangle"></i> Delete Account</h5>
+                        <div class="p-3 border border-danger rounded" style="background: rgba(220, 53, 69, 0.05);">
+                            <p class="mb-2">Once you delete your account, there is no going back. Please be certain.</p>
+                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete()">
+                                Delete Account Permanently
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="card-footer border-success bg-transparent text-center p-3">
+                    <a href="/dashboard" class="text-success text-decoration-none">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete() {
+    if (confirm("Are you sure? All your crop and fertilizer history will be lost forever!")) {
+        window.location.href = "/delete-account";
+    }
+}
+function sendOTP(btn) {
+    btn.disabled = true;
+    btn.innerText = "Sending...";
+    
+    fetch('/send-otp', { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById('otp-msg').innerText = "OTP sent to your registered email!";
+            btn.innerText = "Resend OTP";
+           
+            setTimeout(() => { btn.disabled = false; }, 60000);
+        }
+    });
+}
+</script>
+{% endblock %}

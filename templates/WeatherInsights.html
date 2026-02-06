@@ -1,0 +1,210 @@
+{% extends "base.html"%}
+
+{% block title %}about{% endblock %}
+    {% block head %}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+    
+        .container { max-width: 900px; margin: auto; }
+        
+        /* Card Style */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(168, 224, 99, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            margin-top: 70px;
+        }
+
+        #map { height: 350px; width: 100%; border-radius: 12px; border: 1px solid #a8e063; }
+
+        /* Search Box */
+        .search-box { position: relative; margin-bottom: 15px; }
+        #addressInput { 
+            width: 100%; padding: 12px; border-radius: 8px; border: none; 
+            background: #fff; color: #333; font-size: 1rem; outline: none;
+        }
+        #results { 
+            position: absolute; width: 100%; background: white; color: #222; 
+            z-index: 2000; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; 
+        }
+        .result-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .result-item:hover { background: #f0fdf4; }
+
+        /* Weather Grid */
+        .weather-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .w-item { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center; }
+        .w-item span { display: block; font-size: 1.2rem; font-weight: bold; color: #a8e063; }
+
+        h3 { color: #a8e063; margin-top: 0; }
+       
+    </style>
+        {% endblock %}
+
+    {% block content %}
+<div class="container">
+    <div class="glass-card">
+        <h3><i class="fas fa-map-marked-alt"></i> Select Field Location</h3>
+        <div class="search-box">
+            <input type="text" id="addressInput" placeholder="Enter Village, City or Pincode...">
+            <div id="results"></div>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <div class="glass-card">
+        <h3><i class="fas fa-cloud-sun"></i> Current Weather</h3>
+        <div class="weather-grid">
+            <div class="w-item">Temperature<span id="Temperature">--</span></div>
+            <div class="w-item">Humidity<span id="Humidity">--</span></div>
+            <div class="w-item">Rainfall (mm)<span id="Rainfall">--</span></div>
+        </div>
+    </div>
+
+    <div id="historical-analysis" class="glass-card" style="display: none;"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // 1. MAP INITIALIZATION
+    var map = L.map('map').setView([19.0760, 72.8777], 13);
+    L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']
+    }).addTo(map);
+
+    var marker = L.marker([19.0760, 72.8777], {draggable: true}).addTo(map);
+
+    // 2. FETCH CURRENT WEATHER (WeatherAPI)
+    async function getCurrentWeather(lat, lon) {
+        const apiKey = "8111e6ce53e54ca09e0160256252311";
+        try {
+            const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}`);
+            const data = await res.json();
+            document.getElementById("Temperature").innerText = data.current.temp_c + "°C";
+            document.getElementById("Humidity").innerText = data.current.humidity + "%";
+            document.getElementById("Rainfall").innerText = data.current.precip_mm + " mm";
+        } catch (e) { console.log("Weather fetch error"); }
+    }
+
+    // 3. FETCH LAST YEAR TREND (Open-Meteo Archive)
+    async function getLastYearTrend(lat, lon) {
+        const today = new Date();
+        const start = new Date();
+        start.setFullYear(today.getFullYear() - 1);
+        const end = new Date();
+        end.setFullYear(today.getFullYear() - 1);
+        end.setMonth(start.getMonth() + 3);
+
+        const sStr = start.toISOString().split('T')[0];
+        const eStr = end.toISOString().split('T')[0];
+
+        const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${sStr}&end_date=${eStr}&daily=temperature_2m_max,precipitation_sum,relative_humidity_2m_mean&timezone=auto`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            const temps = data.daily.temperature_2m_max;
+            const rains = data.daily.precipitation_sum;
+            const humidities = data.daily.relative_humidity_2m_mean;
+
+            const avgT = (temps.reduce((a,b)=>a+b,0)/temps.length).toFixed(1);
+            const totalR = rains.reduce((a,b)=>a+b,0).toFixed(1);
+            const avgH = (humidities.reduce((a,b)=>a+b,0)/humidities.length).toFixed(1);
+
+            showHistoricalUI(avgT, totalR, avgH, sStr, eStr);
+        } catch (e) { 
+            console.log("Historical data error"); 
+        }
+    }
+
+    // UPDATE HISTORICAL UI
+    function showHistoricalUI(t, r, h, s, e) {
+        const hDiv = document.getElementById('historical-analysis');
+        hDiv.style.display = 'block';
+        hDiv.innerHTML = `
+            <h3><i class="fas fa-history"></i> Last Year Trend (Same Period)</h3>
+            <p style="font-size:0.8rem; color:#aaa;">Period: ${s} to ${e}</p>
+            <div class="weather-grid">
+                <div class="w-item">Avg Temp<span>${t}°C</span></div>
+                <div class="w-item">Total Rain<span>${r} mm</span></div>
+                <div class="w-item">Avg Humidity<span>${h} %</span></div>
+                <div class="w-item">Status<span>${r > 10 ? 'Wet' : 'Dry'}</span></div>
+            </div>
+            <p style="margin-top:15px; font-size:0.85rem; border-top:1px solid #444; padding-top:10px;">
+                <i class="fas fa-lightbulb" style="color:yellow"></i> 
+                <b>Insights:</b> This period last year was ${r > 10 ? 'rainy' : 'mostly dry'}. 
+                Consider this trend for your upcoming crop planning.
+            </p>
+        `;
+    }
+
+    // 4. EVENTS (Search & Marker)
+    marker.on('dragend', function() {
+        let p = marker.getLatLng();
+        getCurrentWeather(p.lat, p.lng);
+        getLastYearTrend(p.lat, p.lng);
+    });
+
+    // Map Click Logic
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        getCurrentWeather(e.latlng.lat, e.latlng.lng);
+        getLastYearTrend(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Search Box Logic
+    const addrInput = document.getElementById('addressInput');
+    const resDiv = document.getElementById('results');
+
+    addrInput.addEventListener('input', function() {
+        let q = addrInput.value;
+        if(q.length < 3) { resDiv.innerHTML = ''; return; }
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&countrycodes=in&limit=5`)
+        .then(r => r.json()).then(data => {
+            resDiv.innerHTML = '';
+            data.forEach(item => {
+                let d = document.createElement('div');
+                d.className = 'result-item';
+                d.innerText = item.display_name;
+                d.onclick = () => {
+                    map.setView([item.lat, item.lon], 15);
+                    marker.setLatLng([item.lat, item.lon]);
+                    getCurrentWeather(item.lat, item.lon);
+                    getLastYearTrend(item.lat, item.lon);
+                    addrInput.value = item.display_name;
+                    resDiv.innerHTML = '';
+                };
+                resDiv.appendChild(d);
+            });
+        });
+    });
+    
+
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'mr,hi,en'
+    }, 'google_translate_element');
+
+    // गुगलच्या स्टाईल्स ओव्हरराईड करण्यासाठी इंटरव्हल
+    const overrideInterval = setInterval(() => {
+        const select = document.querySelector('.goog-te-combo');
+        if (select) {
+            select.style.setProperty('background-color', '#a8e063', 'important');
+            select.style.setProperty('color', '#0b130e', 'important');
+            select.style.setProperty('border-radius', '12px', 'important');
+            // जर लोगो अजूनही दिसत असेल तर त्याला हाईड करा
+            const gadget = document.querySelector('.goog-te-gadget');
+            if(gadget) gadget.style.fontSize = "0px";
+        }
+    }, 500);
+
+    // ५ सेकंदानंतर चेक करणे थांबवा
+    setTimeout(() => clearInterval(overrideInterval), 5000);
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    {% endblock %}

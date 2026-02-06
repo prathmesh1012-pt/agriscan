@@ -1,0 +1,92 @@
+{% extends "base.html"%}
+
+{% block title %}home{% endblock %}
+    {% block head %}
+    <style>
+        :root {
+            --forest: #1a2f23;
+            --sprout: #a8e063;
+            --earth: #795548;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --dark-bg: #0f1a13;
+        }
+        html {
+    scroll-behavior: smooth;
+}
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: #f0f4f2;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(26, 47, 35, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgb(15, 26, 19)), 
+                        url('https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=2000') center/cover;
+        }
+
+        .hero-content h1 { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 5rem); margin-bottom: 10px; }
+        .hero-content p { font-size: 1.2rem; color: var(--sprout); text-transform: uppercase; letter-spacing: 3px; }
+
+        .grid-container {
+            padding: 100px 5%;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;
+          
+        }
+
+        .card {
+            background: var(--glass); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); padding: 40px; border-radius: 30px;
+            transition: 0.3s; cursor: pointer;
+            color: #ffffff;
+        }
+
+        .card:hover { transform: translateY(-10px); border-color: var(--sprout); }
+        .card h3 { font-family: 'Playfair Display', serif; color: var(--sprout); font-size: 1.8rem; }
+
+        
+
+    
+</style>
+        {% endblock %}
+
+{% block content %} 
+<section class="hero">
+    <div class="hero-content">
+        <p>Powered by Agriscan Intelligence</p>
+        <h1>The Living Farm</h1>
+        <a href="#fields" style="text-decoration: none;">
+    <button class="cta-button">View Live Fields</button>
+</a>
+    </div>
+</section>
+
+<section id="fields" class="grid-container">
+    <div class="card" onclick="window.location='/crop'">
+        <h3>Crop <br>Recommendation</h3>
+        <p>Dynamic modeling analyzes soil vitality to suggest your next high-performance harvest.</p>
+    </div>
+    <div class="card" onclick="window.location='/fertilizer'">
+        <h3>fertilizer Recommendation</h3>
+        <p>Precision nutrient analysis suggests the perfect fertilizer blend 
+        to revitalize your soil and maximize yield potential.</p>
+    </div>
+    <div class="card" onclick="window.location='/WeatherInsights'">
+        <h3>Weather Insights & Analytics</h3>
+        <p>Comparative modeling of historical and real-time weather data to identify trends and mitigate climate risks for your harvest.</p>
+    </div>
+</section>
+
+{% endblock %}

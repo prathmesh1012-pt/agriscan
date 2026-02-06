@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+        .header { text-align: center; border-bottom: 2px solid #28a745; padding-bottom: 10px; }
+        .title { color: #28a745; margin-bottom: 5px; }
+        .report-info { margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .result-box { margin-top: 30px; padding: 20px; background: #e9f7ef; border: 1px solid #c3e6cb; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">AgriScan - Soil Analysis Report</h1>
+        <p>Smart Farming for Better Future</p>
+    </div>
+
+    <div class="report-info">
+        <p><strong>Report ID:</strong> #{{ r.id }}</p>
+        <p><strong>Date:</strong> {{ r.created_at }}</p>
+    </div>
+
+    <h3>Input Details:</h3>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Crop Type</td>
+            <td>{{ r.crop_name }}</td>
+        </tr>
+        <tr>
+            <td>Soil Type</td>
+            <td>{{ r.soil_type }}</td>
+        </tr>
+        <tr>
+            <td>Nitrogen (N)</td>
+            <td>{{ r.nitrogen }}</td>
+        </tr>
+        <tr>
+            <td>Phosphorous (P)</td>
+            <td>{{ r.phosphorous }}</td>
+        </tr>
+        <tr>
+            <td>Potassium (K)</td>
+            <td>{{ r.potassium }}</td>
+        </tr>
+    </table>
+
+    <div class="result-box">
+        <h3>Recommended Fertilizer:</h3>
+        <h2 style="color: #28a745;">{{ r.prediction }}</h2>
+        <p><em>Note: Always follow the recommended dosage per acre based on local agriculture officer's advice.</em></p>
+    </div>
+
+    <div class="footer">
+        <p>This is an generated report by AgriScan Application.</p>
+    </div>
+</body>
+</html>

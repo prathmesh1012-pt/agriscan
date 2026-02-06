@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} base {% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+    
+    <style>
+        :root {
+           --forest: #1a2f23;
+            --sprout: #a8e063;
+            --earth: #795548;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --dark-bg: #0f1a13;
+                --card-bg: rgba(255, 255, 255, 0.05);
+
+           
+        }
+        *{
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+            margin: 0%;
+            padding: 0%;
+            
+        }
+         body {
+            background: #0f1b14;
+            color: #f0f4f2;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+       .modal-content {
+            background: rgba(26, 47, 35, 0.95); backdrop-filter: blur(25px);
+            border: 1px solid var(--sprout); border-radius: 30px;
+        }
+
+        #pills-tab .nav-link {
+            background: transparent !important; color: rgba(255, 255, 255, 0.6) !important;
+            border-bottom: 2px solid transparent; border-radius: 0; transition: 0.3s;
+        }
+
+        #pills-tab .nav-link.active {
+            border-bottom: 2px solid var(--sprout) !important; color: var(--sprout) !important; font-weight: 700;
+        }
+
+        .predict-btn, .cta-button {
+            padding: 15px 40px; border: 1px solid var(--sprout); background: transparent;
+            color: white; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-weight: 600;
+        }
+
+        .predict-btn:hover, .cta-button:hover { background: var(--sprout); color: var(--forest); }
+
+        .dropdown-item {
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    color: rgba(255,255,255,0.8) !important;
+}
+
+.dropdown-item:hover {
+    background: rgba(168, 224, 99, 0.1) !important;
+    color: var(--sprout) !important;
+    transform: translateX(5px);
+}
+
+/* Mobile Toggle Button (Three Lines) */
+.mobile-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--sprout);
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+/* Full Screen Mobile Overlay */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Initially hidden */
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 27, 20, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 2000;
+    transition: 0.5s cubic-bezier(0.77,0.2,0.05,1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mobile-overlay.active {
+    right: 0;
+}
+
+.overlay-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.overlay-content a {
+    font-size: 2rem;
+    color: white;
+    text-decoration: none;
+    font-family: 'Playfair Display', serif;
+    transition: 0.3s;
+}
+
+.overlay-content a:hover {
+    color: var(--sprout);
+}
+
+.close-btn {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 3rem;
+    color: var(--sprout);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+@media (max-width: 400px) {
+    
+}
+iframe.goog-te-banner-frame, 
+.goog-te-banner-frame, 
+#goog-gt-tt, 
+.goog-te-balloon-frame {
+    display: none !important;
+}
+
+body {
+    top: 0px !important;
+}
+.goog-te-gadget {
+    font-size: 0 !important;
+    color: transparent !important;
+}
+
+.goog-te-gadget img, 
+.goog-logo-link {
+    display: none !important;
+}
+
+
+ #google_translate_element select.goog-te-combo {
+    padding: 5px 5px !important;
+    border: none !important;
+    font-weight: bold !important;
+} */
+
+
+#google_translate_element select.goog-te-combo option {
+    background: #0b130e !important;
+    color: #a8e063 !important; 
+    font-weight: bold !important;
+    
+}
+.VIpgJd-ZVi9od-l4eHX-hSRGPd, .VIpgJd-ZVi9od-l4eHX-hSRGPd:link{
+    display: none;
+}
+  .VIpgJd-ZVi9od-ORHb-OEVmcd, .goog-te-gadget img{
+            display: none;
+        }
+
+    /* footer */
+    .footer {
+ 
+    padding: 50px 0 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+}
+
+.container {
+    max-width: 1170px;
+    margin: auto;
+    padding: 0 15px;
+    
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.footer-col {
+    width: 30%;
+    margin-bottom: 30px;
+}
+
+.footer-col h4 {
+    font-size: 18px;
+    color: #00d2ff; 
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.footer-col p {
+    line-height: 1.6;
+    color: #bbbbbb;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li a {
+    color: #bbbbbb;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.footer-col ul li a:hover {
+    color: #ffffff;
+    padding-left: 10px;
+}
+
+.social-links a {
+    display: inline-block;
+    margin-right: 15px;
+    color: #bbbbbb;
+    text-decoration: none;
+    font-size: 14px;
+    border: 1px solid #444;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    background-color: #ffffff;
+    color: #24262b;
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid #444;
+    padding-top: 20px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #999;
+}
+
+/* Mobile Responsive */
+@media(max-width: 767px){
+  .footer-col {
+    width: 100%;
+    text-align: center;
+  }
+  .footer-col ul li a:hover {
+    padding-left: 0;
+  }
+}
+    </style>
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+
+<header style="position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(26, 47, 35, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(168, 224, 99, 0.15);">
+    <nav style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 5%;">
+        
+        <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+            <div style="font-family: 'Michroma', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--sprout);">
+            AGRI<span style="color: white; font-weight: 700;">SCAN</span>   
+            </div>
+        </a>
+
+        <ul class="d-none d-lg-flex" style="list-style: none; gap: 30px; margin: 0; padding: 0; align-items: center;">
+            <li><a href="/" style="text-decoration: none; color: #fff; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Home</a></li>
+            <li><a href="/services" style="text-decoration: none; color: rgba(255,255,255,0.7); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Services</a></li>
+            <li><a href="/about" style="text-decoration: none; color: rgba(255,255,255,0.7); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">about us</a></li>
+            <li><a href="/contact" style="text-decoration: none; color: rgba(255,255,255,0.7); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">contact us</a></li>
+            <li style="display: flex; align-items: center; gap: 8px; background: rgba(168, 224, 99, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(168, 224, 99, 0.2);">
+                <span style="width: 7px; height: 7px; background: #a8e063; border-radius: 50%; box-shadow: 0 0 10px #a8e063;"></span>
+                <span style="font-size: 0.65rem; color: #a8e063; font-weight: 700; letter-spacing: 1px;">LIVE</span>
+            </li>
+        </ul>
+        <div id="google_translate_element" class=""></div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div id="guest-badge" class="d-none">
+                <span class="badge rounded-pill bg-dark text-warning border border-warning" style="font-size: 0.7rem; padding: 6px 12px;">GUEST</span>
+            </div>
+
+            {% if session.get('user_id') %}
+        <div class="dropdown">
+            <button class="btn btn-outline-success btn-sm rounded-pill px-3 dropdown-toggle d-flex align-items-center gap-2" 
+                    type="button" id="farmerDropdown" data-bs-toggle="dropdown" aria-expanded="false" 
+                    style="border-width: 2px; font-weight: 700; color: white;">
+                <i class="fas fa-user-circle fs-5" style="color: var(--sprout);"></i>
+                <!-- {{ session.get('farmer_name') }} -->
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg" 
+                aria-labelledby="farmerDropdown" 
+                style="background: rgba(15, 27, 20, 0.95); border: 1px solid var(--sprout); border-radius: 15px; padding: 10px; width: auto; backdrop-filter: blur(10px);">
+                
+              
+                <li><a class="dropdown-item rounded-3 py-2" href="/dashboard"><i class="fas fa-user me-2 text-success"></i>Dashboard</a></li>
+                <li><a class="dropdown-item rounded-3 py-2" href="/history"><i class="fas fa-history me-2 text-success"></i>Recent Activity / History</a></li>
+                <li><hr class="dropdown-divider" style="background-color: var(--glass-border);"></li>
+                
+                <li><h6 class="dropdown-header text-white-50" style="font-size: 0.7rem; letter-spacing: 1px;">ACCOUNT</h6></li>
+                <li><a class="dropdown-item rounded-3 py-2" href="/settings"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                <li><a class="dropdown-item rounded-3 py-2 text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            </ul>
+        </div>
+    {% else %}
+                <button class="btn btn-outline-success btn-sm rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal" style="font-weight: 600;">
+                    LOGIN
+                </button>
+            {% endif %}
+        </div>
+        <button class="mobile-toggle d-lg-none" onclick="toggleMobileMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </button>
+    </nav>
+</header>
+<div id="mobileMenu" class="mobile-overlay">
+    <button class="close-btn" onclick="toggleMobileMenu()">&times;</button>
+    <div class="overlay-content">
+        <a href="/" onclick="toggleMobileMenu()">Home</a>
+        <a href="#services" onclick="toggleMobileMenu()">Services</a>
+        <a href="/dashboard" onclick="toggleMobileMenu()">Analytics</a>
+        <a href="/about" onclick="toggleMobileMenu()">About Us</a>
+        <a href="/contact" onclick="toggleMobileMenu()">Contact Us</a>
+        {% if not session.get('user_id') %}
+            <button class="predict-btn mt-4" data-bs-toggle="modal" data-bs-target="#loginModal" onclick="toggleMobileMenu()">LOGIN</button>
+        {% endif %}
+    </div>
+</div>
+<div class="modal fade" id="loginModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-white p-2">
+            <button type="button" class="btn-close btn-close-white ms-auto mt-3 me-3" data-bs-dismiss="modal"></button>
+            
+            <div class="modal-body p-4">
+                <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pills-login">Login</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-signup">New Farmer</button></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="pills-login">
+                        <div class="text-center mb-4">
+                            <h3 style="font-family: 'Playfair Display'; color: var(--sprout);">Welcome To AgriScan</h3>
+                            <p class="small text-white-50">Access your farm history.</p>
+                        </div>
+                        <form action="/login" method="POST" autocomplete="username">
+                            <div class="mb-3">
+                                <label class="form-label small">Email / ID</label>
+                                <input type="email" name="email" class="form-control bg-transparent text-white" required autocomplete="username">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small">Password</label>
+                                <input type="password" name="password" class="form-control bg-transparent text-white" required autocomplete="new-password">
+                            </div>
+                            <button type="submit" class="predict-btn w-100">Authorize & Load Data</button>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="pills-signup">
+                        <form action="/register" method="POST">
+                            <div class="mb-3"><label class="form-label small">Full Name</label><input type="text" name="fullname" class="form-control bg-transparent text-white" required></div>
+                            <div class="mb-3"><label class="form-label small">Email</label><input type="email" name="email" class="form-control bg-transparent text-white" required></div>
+                            <div class="mb-4"><label class="form-label small">mobile No</label><input type="text" name="mobile" class="form-control bg-transparent text-white" required></div>
+                            <div class="mb-4"><label class="form-label small">Address</label><input type="text" name="address" class="form-control bg-transparent text-white" required></div>
+                            <div class="mb-4"><label class="form-label small">Set Password</label><input type="password" name="password" class="form-control bg-transparent text-white" required></div>
+                            <button type="submit" class="predict-btn w-100">Create Profile</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-link text-white-50 small text-decoration-none" data-bs-dismiss="modal">Skip for now & continue as Guest →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-col">
+                <h4>Contact Info</h4>
+                <ul class="contact-details">
+                    <li>📍 -------</li>
+                    <li>📞 -------</li>
+                    <li>📧 -------</li>
+                    <li>⏰ -------</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/about">About Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#" title="Facebook">Facebook</a>
+                    <a href="#" title="Instagram">Instagram</a>
+                    <a href="#" title="Twitter">Twitter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 All Rights Reserved |Agriscan Intelligence</p>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+
+<script>
+     document.addEventListener('DOMContentLoaded', () => {
+        const loginModalElement = document.getElementById('loginModal');
+        const loginModal = new bootstrap.Modal(loginModalElement);
+        const guestBadge = document.getElementById('guest-badge');
+
+        // Flask Session & Flash Data
+        const isLoggedIn = "{{ 'true' if session.get('user_id') else 'false' }}";
+        const hasSuccess = "{{ 'true' if get_flashed_messages(category_filter=['success']) else 'false' }}";
+        const hasError = "{{ 'true' if get_flashed_messages(category_filter=['danger']) else 'false' }}";
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // 1. AUTO-POPUP LOGIC
+        if (isLoggedIn === "false" && !sessionStorage.getItem('agriscan_auth') && !urlParams.has('action')) {
+            setTimeout(() => { loginModal.show(); }, 800);
+        }
+
+        // 2. SUCCESS LOGIN POPUP
+        if (hasSuccess === "true") {
+            Swal.fire({
+                title: 'Access Granted!',
+                text: 'Welcome to Agriscan Intelligence.',
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#1a2f23', color: '#fff'
+            });
+        }
+
+        // 3. ERROR LOGIN POPUP
+        if (hasError === "true") {
+            loginModal.show();
+            Swal.fire({ title: 'Error', text: 'Invalid email or password.', icon: 'error', background: '#1a2f23', color: '#fff' });
+        }
+
+        // 4. LOGOUT SUCCESS POPUP
+        if (urlParams.get('action') === 'loggedout') {
+            Swal.fire({
+                title: 'Logged Out',
+                text: 'See you again, Farmer!',
+                icon: 'info',
+                timer: 2000,
+                showConfirmButton: false,
+                background: '#1a2f23', color: '#fff'
+            });
+            sessionStorage.removeItem('agriscan_auth');
+        }
+
+        // Guest Badge Logic
+        if (sessionStorage.getItem('agriscan_auth') === 'guest' && isLoggedIn === "false") {
+            guestBadge.classList.remove('d-none');
+        }
+
+        // Mark as guest when modal is closed without login
+        loginModalElement.addEventListener('hidden.bs.modal', () => {
+            if (isLoggedIn === "false") {
+                sessionStorage.setItem('agriscan_auth', 'guest');
+                guestBadge.classList.remove('d-none');
+            }
+        });
+    });
+    function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('active');
+    
+    // Scroll lock karnya sathi
+    if(menu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'mr,hi,en'
+    }, 'google_translate_element');
+
+    // गुगलच्या स्टाईल्स ओव्हरराईड करण्यासाठी इंटरव्हल
+    const overrideInterval = setInterval(() => {
+        const select = document.querySelector('.goog-te-combo');
+        if (select) {
+            select.style.setProperty('background-color', '#a8e063', 'important');
+            select.style.setProperty('color', '#0b130e', 'important');
+            select.style.setProperty('border-radius', '12px', 'important');
+            // जर लोगो अजूनही दिसत असेल तर त्याला हाईड करा
+            const gadget = document.querySelector('.goog-te-gadget');
+            if(gadget) gadget.style.fontSize = "0px";
+        }
+    }, 500);
+
+    // ५ सेकंदानंतर चेक करणे थांबवा
+    setTimeout(() => clearInterval(overrideInterval), 5000);
+}
+</script>
+{% block scripts %}
+{% endblock %}
+</body>
+</html>

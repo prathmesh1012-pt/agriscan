@@ -1,0 +1,160 @@
+{% extends "base.html"%}
+
+{% block title %}Contact Us{% endblock %}
+    {% block head %}
+  
+<style>
+    
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 36px;
+}
+
+.section-title span { color: #4CAF50; }
+
+.section-subtitle {
+    text-align: center;
+    color: #bbb;
+    margin-bottom: 50px;
+}
+
+/* Flexbox Layout for Form and Info */
+.contact-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.contact-info, .contact-form-container {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* Info Blocks with Gradient */
+.info-box {
+    background: linear-gradient(135deg, #162a1d 0%, #0f1b14 100%);
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.info-box i {
+    font-size: 30px;
+    color: #4CAF50;
+    margin-right: 20px;
+}
+
+.info-box h4 { margin: 0; color: #4CAF50; }
+.info-box p { margin: 5px 0 0; color: #ccc; font-size: 14px; }
+
+/* Contact Form Styling */
+.contact-form-container {
+    background: #162a1d;
+    padding: 40px;
+    border-radius: 20px;
+}
+
+form input, form textarea {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #0f1b14;
+    border: 1px solid #2d5a27;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+}
+
+.input-group {
+    display: flex;
+    gap: 15px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.submit-btn:hover {
+    background: #388E3C;
+    transform: translateY(-3px);
+}
+
+.map-container {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .input-group { flex-direction: column; }
+    .contact-wrapper { flex-direction: column; }
+}
+</style>
+        {% endblock %}
+    {% block content %}
+
+    <section class="contact-page">
+        <div class="container">
+            <h2 class="section-title">Get In <span>Touch</span></h2>
+            <p class="section-subtitle">Have questions about Agriscan? We're here to help you grow.</p>
+
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <div class="info-box">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Our Location</h4>
+                            <p>AgriTech Park, Pune, Maharashtra, India</p>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <h4>Call Us</h4>
+                            <p>---------</p>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email Us</h4>
+                            <p>support@agriscan.com</p>
+                        </div>
+                    </div>
+                </div>
+
+               <form action="/contact_submit" method="POST">
+    <div class="input-group">
+        <input type="text" name="fullname" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+    </div>
+    <input type="text" name="subject" placeholder="Subject">
+    <textarea name="message" placeholder="How can we help your farm?" rows="5" required></textarea>
+    <button type="submit" class="submit-btn">Send Message</button>
+</form>
+            </div>
+
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d121059.0344739699!2d73.79292675!3d18.5248902!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2bf2e67461101%3A0x828d43100dd3f042!2sPune%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" width="100%" height="300" style="border:0; border-radius: 15px;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+    {% endblock %}

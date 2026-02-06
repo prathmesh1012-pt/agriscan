@@ -1,0 +1,44 @@
+iframe.goog-te-banner-frame, 
+.goog-te-banner-frame, 
+#goog-gt-tt, 
+.goog-te-balloon-frame {
+    display: none !important;
+}
+ .VIpgJd-ZVi9od-ORHb-OEVmcd, .goog-te-gadget img{
+            display: none;
+        }
+
+body {
+    top: 0px !important;
+}
+
+/* २. गॅजेटमधील लोगो आणि एक्स्ट्रा स्पेस काढणे */
+.goog-te-gadget {
+    font-size: 0 !important;
+    color: transparent !important;
+}
+
+.goog-te-gadget img, 
+.goog-logo-link {
+    display: none !important;
+}
+
+/* ३. ड्रॉपडाउन स्टाईलिंग ओव्हरराईड (Agriscan Theme) */
+/* येथे आपण ID आणि Class दोन्ही वापरले आहेत जेणेकरून स्टाईल ओव्हरराईड होईल */
+ #google_translate_element select.goog-te-combo {
+    padding: 5px 5px !important;
+    border: none !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+} */
+
+/* ४. ड्रॉपडाउनमधील पर्यायांचा (Options) रंग */
+#google_translate_element select.goog-te-combo option {
+    background: #0b130e !important; /* डार्क बॅकग्राउंड */
+    color: #a8e063 !important; /* हिरवी अक्षरं */
+    font-weight: bold !important;
+    
+}
+.VIpgJd-ZVi9od-l4eHX-hSRGPd, .VIpgJd-ZVi9od-l4eHX-hSRGPd:link{
+    display: none;
+}
