@@ -6,8 +6,17 @@ import pandas as pd
 from database import get_db_connection
 import mysql.connector
 
-path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+import os
+import platform
+import pdfkit
+
+if platform.system() == "Windows":
+    # तुमच्या लोकल पीसीचा पाथ
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+else:
+    # Render (Linux) साठी पाथ - इथे configuration ची गरज नसते जर apt-get ने इन्स्टॉल केलं असेल
+    config = pdfkit.configuration()
 
 from flask import Blueprint
 fert_bp = Blueprint('fertilizer', __name__)
