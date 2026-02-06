@@ -95,4 +95,4 @@ def contact_submit():
             print(f"Error: {e}")
             flash("Kahi tari chukle aahe, parat prayatna kara.", "danger")
 
-        return redirect(url_for('contact')) # Parat contact page var ja
+        return redirect(url_for('contacts')) 
