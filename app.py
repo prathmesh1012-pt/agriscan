@@ -279,40 +279,36 @@ app.config['MAIL_PASSWORD'] =os.getenv("MAIL_PASSWORD")
 mail = Mail(app)
 
 # १. OTP पाठवण्यासाठी रूट
+import smtplib
+from email.mime.text import MIMEText
+
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     try:
-        user_email = session.get('email')
+        user_email = session.get('user_email')
         if not user_email:
-            return jsonify(success=False, error="Email missing. Please Re-login.")
+            return jsonify(success=False, error="Session Expired. Please Re-login.")
 
         otp_code = str(random.randint(100000, 999999))
         session['otp'] = otp_code
 
-        msg = EmailMessage()
-        msg.set_content(f"Your AgriScan verification code is: {otp_code}")
+        msg = MIMEText(f"Your AgriScan Verification Code is: {otp_code}")
         msg['Subject'] = "Verification Code"
         msg['From'] = os.environ.get('MAIL_USERNAME')
         msg['To'] = user_email
 
-        # --- सुधारित भाग: Network is unreachable एरर टाळण्यासाठी ---
-        # जबरदस्ती IPv4 (AF_INET) वापरण्यासाठी ही ट्रिक:
-        old_getaddrinfo = socket.getaddrinfo
-        def new_getaddrinfo(*args, **kwargs):
-            responses = old_getaddrinfo(*args, **kwargs)
-            return [r for r in responses if r[0] == socket.AF_INET]
-        
-        socket.getaddrinfo = new_getaddrinfo
-        # --------------------------------------------------------
-
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as server:
-            server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
-            server.send_message(msg)
+        # Port 587 वापरून TLS कनेक्शन (हे Render वर अधिक stable असते)
+        # Timeout 30 सेकंद केला आहे जेणेकरून घाई होणार नाही
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
+        server.starttls() # Secure connection सुरू करा
+        server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+        server.sendmail(msg['From'], [msg['To']], msg.as_string())
+        server.quit()
             
         return jsonify(success=True)
 
     except Exception as e:
-        print(f"SMTP Error: {e}")
+        print(f"DEBUG ERROR: {e}")
         return jsonify(success=False, error=str(e))
 # २. पासवर्ड आणि OTP व्हेरिफाय करण्याचा रूट
 @app.route('/verify-and-change-password', methods=['POST'])
