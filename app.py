@@ -282,7 +282,7 @@ mail = Mail(app)
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     try:
-        user_email = session.get('user_email')
+        user_email = session.get('email')
         if not user_email:
             return jsonify(success=False, error="Email missing. Please Re-login.")
 
