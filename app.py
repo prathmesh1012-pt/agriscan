@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request, render_template, redirect, url_for, flash, session, jsonify
 from database import get_db_connection
 from auth import auth_bp
@@ -261,11 +262,11 @@ def update_profile():
     return redirect('/dashboard?updated=true#profile')
 
 # email_configuration for OTP
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'agriscanintelligence@gmail.com' 
-app.config['MAIL_PASSWORD'] = 'zhqmrbbosajmhcja'   
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER")
+app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS").lower() == 'true'
+app.config['MAIL_USERNAME'] =os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] =os.getenv("MAIL_PASSWORD") 
 mail = Mail(app)
 
 # १. OTP पाठवण्यासाठी रूट
