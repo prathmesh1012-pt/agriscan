@@ -280,9 +280,10 @@ mail = Mail(app)
 
 # १. OTP पाठवण्यासाठी रूट
 
-from email.mime.text import MIMEText
 
-# हे फाईलच्या सुरुवातीला इम्पोर्ट करा
+import smtplib
+import ssl
+from email.mime.text import MIMEText
 
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
@@ -291,7 +292,7 @@ def send_otp():
         print(f"DEBUG: Attempting to send OTP to -> {user_email}")
 
         if not user_email:
-            return jsonify(success=False, error="Email missing.")
+            return jsonify(success=False, error="Session expired. Please login again.")
 
         otp_code = str(random.randint(100000, 999999))
         session['otp'] = otp_code
@@ -301,24 +302,14 @@ def send_otp():
         msg['From'] = os.environ.get('MAIL_USERNAME')
         msg['To'] = user_email
 
-        # --- महत्ताचा बदल: IPv4 Force करणे ---
-        # काही वेळा Render चे सर्व्हर IPv6 कडे वळतात जे Gmail साठी ब्लॉक असू शकतात
-        # ही ट्रिक सिस्टिमला फक्त IPv4 एड्रेस शोधायला लावते
-        original_getaddrinfo = socket.getaddrinfo
-        def ipv4_only_getaddrinfo(*args, **kwargs):
-            res = original_getaddrinfo(*args, **kwargs)
-            return [r for r in res if r[0] == socket.AF_INET]
+        # --- Port 465 + SSL (Direct Secure Connection) ---
+        context = ssl.create_default_context()
         
-        socket.getaddrinfo = ipv4_only_getaddrinfo
-        # ---------------------------------------
+        # ३० सेकंदांचा पूर्ण वेळ देऊया जेणेकरून 'timeout' होणार नाही
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context, timeout=30) as server:
+            server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+            server.sendmail(msg['From'], [msg['To']], msg.as_string())
 
-        # Port 587 वापरा (हा Render वर जास्त Reliable आहे)
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
-        server.starttls() 
-        server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
-        server.sendmail(msg['From'], [msg['To']], msg.as_string())
-        server.quit()
-        
         print(f"DEBUG: OTP sent successfully to {user_email}")
         return jsonify(success=True)
 
