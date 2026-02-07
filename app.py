@@ -285,7 +285,7 @@ from email.mime.text import MIMEText
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     try:
-        user_email = session.get('user_email')
+        user_email = session.get('email')
         
         # जर सेशनमध्ये ईमेल नसेल तर तो युजर आयडी वरून ओढून घ्या (बॅकअप)
         # user = User.query.get(session.get('user_id'))
