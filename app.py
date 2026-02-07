@@ -287,7 +287,7 @@ from email.mime.text import MIMEText
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     try:
-        user_email = session.get('user_email')
+        user_email = session.get('email')
         print(f"DEBUG: Attempting to send OTP to -> {user_email}")
 
         if not user_email:
