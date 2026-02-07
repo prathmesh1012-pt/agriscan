@@ -279,22 +279,19 @@ app.config['MAIL_PASSWORD'] =os.getenv("MAIL_PASSWORD")
 mail = Mail(app)
 
 # १. OTP पाठवण्यासाठी रूट
-import smtplib
+
 from email.mime.text import MIMEText
+
+# हे फाईलच्या सुरुवातीला इम्पोर्ट करा
 
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     try:
-        user_email = session.get('email')
-        
-        # जर सेशनमध्ये ईमेल नसेल तर तो युजर आयडी वरून ओढून घ्या (बॅकअप)
-        # user = User.query.get(session.get('user_id'))
-        # user_email = user.email
-        
-        print(f"DEBUG: Attempting to send OTP to -> {user_email}") # हे लॉगमध्ये तपासा
+        user_email = session.get('user_email')
+        print(f"DEBUG: Attempting to send OTP to -> {user_email}")
 
         if not user_email:
-            return jsonify(success=False, error="Email missing. Please login again.")
+            return jsonify(success=False, error="Email missing.")
 
         otp_code = str(random.randint(100000, 999999))
         session['otp'] = otp_code
@@ -304,7 +301,18 @@ def send_otp():
         msg['From'] = os.environ.get('MAIL_USERNAME')
         msg['To'] = user_email
 
-        # Port 587 + STARTTLS (सर्वात खात्रीशीर मार्ग)
+        # --- महत्ताचा बदल: IPv4 Force करणे ---
+        # काही वेळा Render चे सर्व्हर IPv6 कडे वळतात जे Gmail साठी ब्लॉक असू शकतात
+        # ही ट्रिक सिस्टिमला फक्त IPv4 एड्रेस शोधायला लावते
+        original_getaddrinfo = socket.getaddrinfo
+        def ipv4_only_getaddrinfo(*args, **kwargs):
+            res = original_getaddrinfo(*args, **kwargs)
+            return [r for r in res if r[0] == socket.AF_INET]
+        
+        socket.getaddrinfo = ipv4_only_getaddrinfo
+        # ---------------------------------------
+
+        # Port 587 वापरा (हा Render वर जास्त Reliable आहे)
         server = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
         server.starttls() 
         server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
