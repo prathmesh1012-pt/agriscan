@@ -8,6 +8,12 @@ import mysql.connector
 import pickle
 from flask_mail import Mail, Message
 import random
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 #  मॉडेल आणि स्केलर्स लोड
 
