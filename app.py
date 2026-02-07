@@ -270,29 +270,19 @@ app.config['MAIL_PASSWORD'] =os.getenv("MAIL_PASSWORD")
 mail = Mail(app)
 
 # १. OTP पाठवण्यासाठी रूट
-# send_otp फंक्शनमध्ये बदल करा
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
-    try:
-        user_email = session.get('user_email')
-        if not user_email:
-            # जर सेशनमध्ये ईमेल नसेल तर युजर आयडीवरून डेटाबेस मधून मिळवा
-            return jsonify(success=False, error="Email not found in session")
-
-        otp_code = str(random.randint(100000, 999999))
-        session['otp'] = otp_code
-        
-        msg = Message("AgriScan Verification Code", 
-                      recipients=[user_email])
-        msg.body = f"Your verification code is: {otp_code}"
-        
-        # ईमेल पाठवणे
-        mail.send(msg)
-        return jsonify(success=True)
-        
-    except Exception as e:
-        print(f"SMTP ERROR: {e}") # हे Render Logs मध्ये दिसेल
-        return jsonify(success=False, error=str(e))
+    email = session.get('email')
+    otp = str(random.randint(100000, 999999))
+    session['otp'] = otp 
+    
+    msg = Message('Password Change OTP - AgriTech', 
+                  sender='agriscanintelligence@gmail.com', 
+                  recipients=[email])
+    msg.body = f"Your OTP for changing password is: {otp}. Do not share it with anyone."
+    mail.send(msg)
+    
+    return jsonify({"success": True, "message": "OTP sent to your email!"})
 
 # २. पासवर्ड आणि OTP व्हेरिफाय करण्याचा रूट
 @app.route('/verify-and-change-password', methods=['POST'])
