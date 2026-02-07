@@ -286,8 +286,15 @@ from email.mime.text import MIMEText
 def send_otp():
     try:
         user_email = session.get('user_email')
+        
+        # जर सेशनमध्ये ईमेल नसेल तर तो युजर आयडी वरून ओढून घ्या (बॅकअप)
+        # user = User.query.get(session.get('user_id'))
+        # user_email = user.email
+        
+        print(f"DEBUG: Attempting to send OTP to -> {user_email}") # हे लॉगमध्ये तपासा
+
         if not user_email:
-            return jsonify(success=False, error="Session Expired. Please Re-login.")
+            return jsonify(success=False, error="Email missing. Please login again.")
 
         otp_code = str(random.randint(100000, 999999))
         session['otp'] = otp_code
@@ -297,14 +304,14 @@ def send_otp():
         msg['From'] = os.environ.get('MAIL_USERNAME')
         msg['To'] = user_email
 
-        # Port 587 वापरून TLS कनेक्शन (हे Render वर अधिक stable असते)
-        # Timeout 30 सेकंद केला आहे जेणेकरून घाई होणार नाही
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
-        server.starttls() # Secure connection सुरू करा
+        # Port 587 + STARTTLS (सर्वात खात्रीशीर मार्ग)
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
+        server.starttls() 
         server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
         server.sendmail(msg['From'], [msg['To']], msg.as_string())
         server.quit()
-            
+        
+        print(f"DEBUG: OTP sent successfully to {user_email}")
         return jsonify(success=True)
 
     except Exception as e:
