@@ -8,11 +8,14 @@ import mysql.connector
 import pickle
 from flask_mail import Mail, Message
 import random
+
 import os
-
 from dotenv import load_dotenv
-
 load_dotenv()
+
+import smtplib
+from email.message import EmailMessage
+import socket
 
 
 #  मॉडेल आणि स्केलर्स लोड
@@ -278,17 +281,31 @@ mail = Mail(app)
 # १. OTP पाठवण्यासाठी रूट
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
-    email = session.get('email')
-    otp = str(random.randint(100000, 999999))
-    session['otp'] = otp 
-    
-    msg = Message('Password Change OTP - AgriTech', 
-                  sender='agriscanintelligence@gmail.com', 
-                  recipients=[email])
-    msg.body = f"Your OTP for changing password is: {otp}. Do not share it with anyone."
-    mail.send(msg)
-    
-    return jsonify({"success": True, "message": "OTP sent to your email!"})
+    try:
+        user_email = session.get('email')
+        otp_code = str(random.randint(100000, 999999))
+        session['otp'] = otp_code
+        
+        # ईमेल तयार करा
+        msg = EmailMessage()
+        msg.set_content(f"Your AgriScan verification code is: {otp_code}")
+        msg['Subject'] = "Verification Code"
+        msg['From'] = os.environ.get('MAIL_USERNAME')   
+        msg['To'] = user_email
+
+        # डायरेक्ट SMTP SSL कनेक्शन (Timeout सह)
+        # यामुळे जर कनेक्शन नाही झालं तर ते १० सेकंदात बंद होईल, सर्व्हर हँग होणार नाही
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10) as server:
+            server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+            server.send_message(msg)
+            
+        return jsonify(success=True)
+
+    except socket.timeout:
+        return jsonify(success=False, error="Connection timed out. Please try again.")
+    except Exception as e:
+        print(f"SMTP Error: {e}")
+        return jsonify(success=False, error=str(e))
 
 # २. पासवर्ड आणि OTP व्हेरिफाय करण्याचा रूट
 @app.route('/verify-and-change-password', methods=['POST'])
