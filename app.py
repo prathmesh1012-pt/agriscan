@@ -282,31 +282,38 @@ mail = Mail(app)
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     try:
-        user_email = session.get('email')
+        user_email = session.get('user_email')
+        if not user_email:
+            return jsonify(success=False, error="Email missing. Please Re-login.")
+
         otp_code = str(random.randint(100000, 999999))
         session['otp'] = otp_code
-        
-        # ईमेल तयार करा
+
         msg = EmailMessage()
         msg.set_content(f"Your AgriScan verification code is: {otp_code}")
         msg['Subject'] = "Verification Code"
-        msg['From'] = os.environ.get('MAIL_USERNAME')   
+        msg['From'] = os.environ.get('MAIL_USERNAME')
         msg['To'] = user_email
 
-        # डायरेक्ट SMTP SSL कनेक्शन (Timeout सह)
-        # यामुळे जर कनेक्शन नाही झालं तर ते १० सेकंदात बंद होईल, सर्व्हर हँग होणार नाही
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10) as server:
+        # --- सुधारित भाग: Network is unreachable एरर टाळण्यासाठी ---
+        # जबरदस्ती IPv4 (AF_INET) वापरण्यासाठी ही ट्रिक:
+        old_getaddrinfo = socket.getaddrinfo
+        def new_getaddrinfo(*args, **kwargs):
+            responses = old_getaddrinfo(*args, **kwargs)
+            return [r for r in responses if r[0] == socket.AF_INET]
+        
+        socket.getaddrinfo = new_getaddrinfo
+        # --------------------------------------------------------
+
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as server:
             server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
             server.send_message(msg)
             
         return jsonify(success=True)
 
-    except socket.timeout:
-        return jsonify(success=False, error="Connection timed out. Please try again.")
     except Exception as e:
         print(f"SMTP Error: {e}")
         return jsonify(success=False, error=str(e))
-
 # २. पासवर्ड आणि OTP व्हेरिफाय करण्याचा रूट
 @app.route('/verify-and-change-password', methods=['POST'])
 def verify_and_change_password():
