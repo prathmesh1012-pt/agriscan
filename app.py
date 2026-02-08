@@ -285,37 +285,57 @@ import smtplib
 import ssl
 from email.mime.text import MIMEText
 
+import smtplib
+import ssl
+import socket
+
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
+    user_email = session.get('email')
+    otp_code = str(random.randint(100000, 999999))
+    session['otp'] = otp_code
+
+    msg = MIMEText(f"Your AgriScan Verification Code is: {otp_code}")
+    msg['Subject'] = "Verification Code"
+    msg['From'] = os.environ.get('MAIL_USERNAME')
+    msg['To'] = user_email
+
+    # IPv4 सक्तीची (Network unreachable टाळण्यासाठी)
+    socket.setdefaulttimeout(20)
+    original_getaddrinfo = socket.getaddrinfo
+    def ipv4_only(*args, **kwargs):
+        res = original_getaddrinfo(*args, **kwargs)
+        return [r for r in res if r[0] == socket.AF_INET]
+    socket.getaddrinfo = ipv4_only
+
+    # --- IDEA: दोन्ही पोर्ट्स ट्राय करणे ---
+    
+    # १. पहिला प्रयत्न: Port 465 (SSL)
     try:
-        user_email = session.get('email')
-        print(f"DEBUG: Attempting to send OTP to -> {user_email}")
-
-        if not user_email:
-            return jsonify(success=False, error="Session expired. Please login again.")
-
-        otp_code = str(random.randint(100000, 999999))
-        session['otp'] = otp_code
-
-        msg = MIMEText(f"Your AgriScan Verification Code is: {otp_code}")
-        msg['Subject'] = "Verification Code"
-        msg['From'] = os.environ.get('MAIL_USERNAME')
-        msg['To'] = user_email
-
-        # --- Port 465 + SSL (Direct Secure Connection) ---
+        print("DEBUG: Trying Port 465 (SSL)...")
         context = ssl.create_default_context()
-        
-        # ३० सेकंदांचा पूर्ण वेळ देऊया जेणेकरून 'timeout' होणार नाही
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context, timeout=30) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
             server.sendmail(msg['From'], [msg['To']], msg.as_string())
-
-        print(f"DEBUG: OTP sent successfully to {user_email}")
+        print("DEBUG: Success on Port 465!")
         return jsonify(success=True)
 
-    except Exception as e:
-        print(f"DEBUG ERROR: {e}")
-        return jsonify(success=False, error=str(e))
+    except Exception as e1:
+        print(f"DEBUG: Port 465 failed: {e1}")
+        
+        # २. दुसरा प्रयत्न (Fallback): Port 587 (TLS)
+        try:
+            print("DEBUG: Falling back to Port 587 (TLS)...")
+            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                server.starttls()
+                server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+                server.sendmail(msg['From'], [msg['To']], msg.as_string())
+            print("DEBUG: Success on Port 587!")
+            return jsonify(success=True)
+            
+        except Exception as e2:
+            print(f"DEBUG: Both ports failed. Port 587 error: {e2}")
+            return jsonify(success=False, error="All mail ports are blocked on this network.")
 # २. पासवर्ड आणि OTP व्हेरिफाय करण्याचा रूट
 @app.route('/verify-and-change-password', methods=['POST'])
 def verify_and_change_password():
