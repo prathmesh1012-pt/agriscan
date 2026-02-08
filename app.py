@@ -290,6 +290,7 @@ import requests # हे टॉपला इम्पोर्ट करा
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     user_email = session.get('email')
+    print(f"Attempting to send OTP to email: {user_email}")
     otp_code = str(random.randint(100000, 999999))
     session['otp'] = otp_code
 
