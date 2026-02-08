@@ -285,9 +285,7 @@ import smtplib
 import ssl
 from email.mime.text import MIMEText
 
-import smtplib
-import ssl
-import socket
+import requests # हे टॉपला इम्पोर्ट करा
 
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
@@ -295,47 +293,34 @@ def send_otp():
     otp_code = str(random.randint(100000, 999999))
     session['otp'] = otp_code
 
-    msg = MIMEText(f"Your AgriScan Verification Code is: {otp_code}")
-    msg['Subject'] = "Verification Code"
-    msg['From'] = os.environ.get('MAIL_USERNAME')
-    msg['To'] = user_email
+    # Mailtrap API Configuration
+    api_url = "https://send.api.mailtrap.io/api/send"
+    api_token = os.getenv("MAILTRAP_TOKEN") # Mailtrap कडून मिळालेला की
 
-    # IPv4 सक्तीची (Network unreachable टाळण्यासाठी)
-    socket.setdefaulttimeout(20)
-    original_getaddrinfo = socket.getaddrinfo
-    def ipv4_only(*args, **kwargs):
-        res = original_getaddrinfo(*args, **kwargs)
-        return [r for r in res if r[0] == socket.AF_INET]
-    socket.getaddrinfo = ipv4_only
+    payload = {
+        "from": {"email": "hello@demomailtrap.co", "name": "AgriScan Team"},
+        "to": [{"email": user_email}],
+        "subject": "Verification Code",
+        "text": f"Your AgriScan verification code is: {otp_code}",
+        "category": "OTP"
+    }
 
-    # --- IDEA: दोन्ही पोर्ट्स ट्राय करणे ---
-    
-    # १. पहिला प्रयत्न: Port 465 (SSL)
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json"
+    }
+
     try:
-        print("DEBUG: Trying Port 465 (SSL)...")
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
-            server.sendmail(msg['From'], [msg['To']], msg.as_string())
-        print("DEBUG: Success on Port 465!")
-        return jsonify(success=True)
-
-    except Exception as e1:
-        print(f"DEBUG: Port 465 failed: {e1}")
-        
-        # २. दुसरा प्रयत्न (Fallback): Port 587 (TLS)
-        try:
-            print("DEBUG: Falling back to Port 587 (TLS)...")
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
-                server.starttls()
-                server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
-                server.sendmail(msg['From'], [msg['To']], msg.as_string())
-            print("DEBUG: Success on Port 587!")
+        response = requests.post(api_url, json=payload, headers=headers)
+        if response.status_code == 200:
+            print("Email sent successfully via Mailtrap API!")
             return jsonify(success=True)
-            
-        except Exception as e2:
-            print(f"DEBUG: Both ports failed. Port 587 error: {e2}")
-            return jsonify(success=False, error="All mail ports are blocked on this network.")
+        else:
+            print(f"API Error: {response.text}")
+            return jsonify(success=False, error="Failed to send email via API")
+    except Exception as e:
+        print(f"Request Error: {e}")
+        return jsonify(success=False, error=str(e))
 # २. पासवर्ड आणि OTP व्हेरिफाय करण्याचा रूट
 @app.route('/verify-and-change-password', methods=['POST'])
 def verify_and_change_password():
